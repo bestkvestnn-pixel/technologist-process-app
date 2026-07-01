@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Технолог — разработка техпроцессов</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <nav class="topbar" aria-label="Главная навигация">
+        <div class="brand">
+          <span class="brand__mark">Т</span>
+          <span>
+            <strong>Технолог</strong>
+            <small>ТП по чертежу, эскизу или мат. модели</small>
+          </span>
+        </div>
+        <div class="topbar__actions">
+          <button class="button button--ghost" id="loadDemoButton" type="button">Демо</button>
+          <button class="button button--ghost" id="resetButton" type="button">Очистить</button>
+          <button class="button" id="exportJsonButton" type="button">Экспорт JSON</button>
+        </div>
+      </nav>
+
+      <section class="hero__content">
+        <div>
+          <p class="eyebrow">Инженерный помощник</p>
+          <h1>Соберите маршрут, операции, оснастку и контроль за один проход.</h1>
+          <p class="hero__lead">
+            Загрузите чертёж, эскиз или 3D-модель, опишите деталь и получите черновик технологического процесса:
+            заготовка, маршрут, режимы, инструмент, контрольные переходы и вопросы для уточнения.
+          </p>
+        </div>
+        <aside class="hero__card" aria-label="Статус проекта">
+          <span class="status-dot"></span>
+          <strong id="readinessScore">0%</strong>
+          <span>готовность исходных данных</span>
+          <progress id="readinessProgress" max="100" value="0"></progress>
+        </aside>
+      </section>
+    </header>
+
+    <main class="workspace">
+      <section class="panel intake-panel" aria-labelledby="sourceTitle">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Шаг 1</p>
+            <h2 id="sourceTitle">Исходные данные</h2>
+          </div>
+          <span class="pill" id="sourceTypePill">не выбрано</span>
+        </div>
+
+        <form id="processForm" class="form">
+          <fieldset class="segmented" aria-label="Тип исходника">
+            <label>
+              <input type="radio" name="sourceType" value="drawing" checked />
+              <span>Чертёж</span>
+            </label>
+            <label>
+              <input type="radio" name="sourceType" value="sketch" />
+              <span>Эскиз</span>
+            </label>
+            <label>
+              <input type="radio" name="sourceType" value="model" />
+              <span>Мат. модель</span>
+            </label>
+          </fieldset>
+
+          <label class="dropzone" for="sourceFile">
+            <input id="sourceFile" type="file" accept=".pdf,.png,.jpg,.jpeg,image/jpeg,image/png,image/svg+xml,.svg,.step,.stp,.iges,.igs,.stl,.obj,.sldprt,.x_t,.x_b" />
+            <span class="dropzone__icon">↥</span>
+            <strong>Загрузить файл</strong>
+            <small id="fileHint">PDF, JPG/JPEG, PNG, SVG, STEP/STP, IGES, STL, OBJ, SLDPRT, Parasolid</small>
+          </label>
+          <figure id="imagePreview" class="image-preview" hidden>
+            <img id="imagePreviewImg" alt="Предпросмотр загруженного JPG/изображения" />
+            <figcaption id="imagePreviewCaption">Предпросмотр изображения</figcaption>
+          </figure>
+
+          <div class="grid two">
+            <label>
+              Обозначение детали
+              <input name="partNumber" placeholder="Напр. ВАЛ-24.001" />
+            </label>
+            <label>
+              Наименование
+              <input name="partName" placeholder="Напр. Вал приводной" />
+            </label>
+            <label>
+              Материал
+              <input name="material" placeholder="Напр. Сталь 45 ГОСТ 1050-2013" />
+            </label>
+            <label>
+              Масса / габариты
+              <input name="dimensions" placeholder="Напр. Ø48×220 мм, 1.8 кг" />
+            </label>
+            <label>
+              Тип производства
+              <select name="productionType">
+                <option value="single">Единичное</option>
+                <option value="batch">Серийное</option>
+                <option value="mass">Массовое</option>
+              </select>
+            </label>
+            <label>
+              Заготовка
+              <select name="blankType">
+                <option value="auto">Подобрать автоматически</option>
+                <option value="round-bar">Круглый прокат</option>
+                <option value="sheet">Лист / плита</option>
+                <option value="casting">Отливка</option>
+                <option value="forging">Поковка</option>
+                <option value="weldment">Сварная заготовка</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Ключевые поверхности и требования
+            <textarea name="requirements" rows="4" placeholder="Напр. 2 шейки Ø35 h6, паз 8P9, Ra 1.6, термообработка HRC 40...45"></textarea>
+          </label>
+
+          <label>
+            Доступное оборудование
+            <input name="equipment" placeholder="Напр. токарный ЧПУ, вертикально-фрезерный, круглошлифовальный" />
+          </label>
+
+          <label>
+            Распознанный текст / заметки с чертежа, эскиза или модели
+            <textarea name="sourceNotes" rows="5" placeholder="Вставьте текст с основной надписи, технических требований или PMI модели: материал, размеры, Ra, посадки, термообработка, резьбы..."></textarea>
+          </label>
+        </form>
+      </section>
+
+      <section class="panel" aria-labelledby="assistantTitle">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Шаг 2</p>
+            <h2 id="assistantTitle">Отчёт по исходнику</h2>
+          </div>
+          <button class="button" id="generateReportButton" type="button">Сформировать отчёт</button>
+        </div>
+
+        <div class="assistant-grid">
+          <article class="card">
+            <h3>Извлечение данных</h3>
+            <ul id="extractionList" class="check-list"></ul>
+          </article>
+          <article class="card">
+            <h3>Вопросы для уточнения</h3>
+            <ul id="questionsList" class="question-list"></ul>
+          </article>
+          <article class="card">
+            <h3>Отчёт заполнения граф</h3>
+            <ul id="reportFieldsList" class="document-list">
+              <li>Сформируйте отчёт после загрузки файла или вставки текста.</li>
+            </ul>
+          </article>
+          <article class="card agent-card">
+            <div class="card__title-row">
+              <h3>Агент инженер-технолог</h3>
+              <span class="pill" id="agentStatusPill">не запускался</span>
+            </div>
+            <p id="agentSummary" class="muted">Агент подключится при формировании отчёта или создании ТП.</p>
+            <ul id="agentFindingsList" class="document-list">
+              <li>Анализ чертежа и рекомендации появятся здесь.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel process-panel" aria-labelledby="routeTitle">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Шаг 3</p>
+            <h2 id="routeTitle">Маршрут и операции</h2>
+          </div>
+          <div class="panel__actions">
+            <button class="button button--ghost" id="exportTextButton" type="button">Экспорт TXT</button>
+            <button class="button" id="generateButton" type="button">Создать ТП</button>
+          </div>
+        </div>
+        <div id="routeTimeline" class="timeline empty-state">
+          Сначала сформируйте отчёт по исходнику, затем нажмите «Создать ТП».
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="toolingTitle">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Шаг 4</p>
+            <h2 id="toolingTitle">Инструмент, оснастка и контроль</h2>
+          </div>
+          <span class="pill">с каталогом-источником</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Позиция</th>
+                <th>Назначение</th>
+                <th>Типоразмер</th>
+                <th>Каталог-источник</th>
+              </tr>
+            </thead>
+            <tbody id="toolingTable">
+              <tr>
+                <td colspan="4" class="muted">Ведомость появится после формирования процесса.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel documents-panel" aria-labelledby="documentsTitle">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Шаг 5</p>
+            <h2 id="documentsTitle">Комплект документов по ГОСТ 3.1118-82</h2>
+          </div>
+          <span class="pill" id="gostStandardPill">ГОСТ 3.1118-82</span>
+        </div>
+        <div id="documentsSet" class="documents-set empty-state">
+          Комплект документов будет сформирован после создания технологического процесса.
+        </div>
+      </section>
+
+      <section class="panel cnc-panel" aria-labelledby="cncTitle">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Шаг 6</p>
+            <h2 id="cncTitle">G-код для ЧПУ</h2>
+          </div>
+          <div class="panel__actions">
+            <button class="button button--ghost" id="exportCncButton" type="button">Экспорт программы</button>
+            <button class="button" id="generateCncButton" type="button">Написать G-код</button>
+          </div>
+        </div>
+
+        <div class="cnc-toolbar">
+          <label>
+            Система ЧПУ
+            <select id="cncController" name="cncController">
+              <option value="nc210">NC 210</option>
+              <option value="sinumerik" selected>Sinumerik</option>
+            </select>
+          </label>
+          <div class="cnc-meta">
+            <span class="pill" id="cncProgramName">программа не сформирована</span>
+            <p id="cncSafetyNote">
+              Сначала сформируйте ТП, затем выберите стойку и создайте черновой G-код.
+            </p>
+          </div>
+        </div>
+
+        <pre class="code-preview" aria-label="Предпросмотр G-кода"><code id="cncProgramCode">G-код появится здесь.</code></pre>
+      </section>
+    </main>
+
+    <template id="operationTemplate">
+      <article class="operation">
+        <div class="operation__index"></div>
+        <div class="operation__body">
+          <div class="operation__title-row">
+            <h3></h3>
+            <span class="pill"></span>
+          </div>
+          <p></p>
+          <ul></ul>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>

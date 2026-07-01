@@ -1,0 +1,19 @@
+{
+  "name": "technologist-process-app",
+  "version": "0.1.0",
+  "description": "Приложение для разработки технологических процессов по чертежу, эскизу или 3D-модели.",
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 5173",
+    "test": "node tests/domain.test.js"
+  },
+  "keywords": [
+    "технологический процесс",
+    "машиностроение",
+    "чертеж",
+    "эскиз",
+    "3d-model"
+  ],
+  "license": "UNLICENSED",
+  "private": true
+}
