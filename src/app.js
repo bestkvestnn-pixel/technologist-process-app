@@ -3,6 +3,7 @@ import { analyzeInput, exportProcessAsText, generateProcess, labels } from "./do
 import { generateSourceReport } from "./report.js";
 import { runTechnologistAgent } from "./technologist-agent.js";
 
+const startPage = document.querySelector("#startPage");
 const form = document.querySelector("#processForm");
 const fileInput = document.querySelector("#sourceFile");
 const fileHint = document.querySelector("#fileHint");
@@ -55,6 +56,23 @@ bindEvents();
 refreshAnalysis();
 
 function bindEvents() {
+  document.querySelector("#startWorkButton").addEventListener("click", () => {
+    openWorkspace();
+  });
+
+  document.querySelector("#openWorkspaceTopButton").addEventListener("click", () => {
+    openWorkspace();
+  });
+
+  document.querySelector("#homeButton").addEventListener("click", () => {
+    showStartPage();
+  });
+
+  document.querySelector("#startDemoButton").addEventListener("click", () => {
+    loadDemo();
+    openWorkspace();
+  });
+
   form.addEventListener("input", () => {
     persist();
     refreshAnalysis();
@@ -135,22 +153,38 @@ function bindEvents() {
   });
 
   document.querySelector("#loadDemoButton").addEventListener("click", () => {
-    writeForm(demoProject);
-    state.fileName = demoProject.fileName;
-    fileHint.textContent = demoProject.fileName;
-    clearImagePreview();
-    state.process = generateProcess(readForm());
-    state.agentResult = runTechnologistAgent(readForm());
-    state.sourceReport = state.agentResult.sourceReport;
-    state.cncProgram = generateCncProgram(state.process, { controller: cncController.value });
-    persist();
-    refreshAnalysis();
-    renderSourceReport(state.sourceReport);
-    renderAgentResult(state.agentResult);
-    renderProcess(state.process);
-    renderDocumentsSet(state.process.gostDocuments);
-    renderCncProgram(state.cncProgram);
+    loadDemo();
   });
+}
+
+function openWorkspace() {
+  startPage.hidden = true;
+  document.body.classList.add("workspace-open");
+  document.querySelector(".hero").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function showStartPage() {
+  startPage.hidden = false;
+  document.body.classList.remove("workspace-open");
+  startPage.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function loadDemo() {
+  writeForm(demoProject);
+  state.fileName = demoProject.fileName;
+  fileHint.textContent = demoProject.fileName;
+  clearImagePreview();
+  state.process = generateProcess(readForm());
+  state.agentResult = runTechnologistAgent(readForm());
+  state.sourceReport = state.agentResult.sourceReport;
+  state.cncProgram = generateCncProgram(state.process, { controller: cncController.value });
+  persist();
+  refreshAnalysis();
+  renderSourceReport(state.sourceReport);
+  renderAgentResult(state.agentResult);
+  renderProcess(state.process);
+  renderDocumentsSet(state.process.gostDocuments);
+  renderCncProgram(state.cncProgram);
 }
 
 function ensureProcess() {
