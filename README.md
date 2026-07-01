@@ -40,3 +40,13 @@ http://localhost:5173
 ```bash
 /Users/pavel/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node tests/domain.test.js
 ```
+
+## Отчёт по методическим указаниям
+
+PDF-отчёт для курсовой работы:
+
+[output/pdf/otchet_ai_technolog.pdf](output/pdf/otchet_ai_technolog.pdf)
+
+Исходник/краткая структура отчёта:
+
+[output/pdf/otchet_ai_technolog.md](output/pdf/otchet_ai_technolog.md)
